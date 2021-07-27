@@ -4,14 +4,13 @@ import api from "../../apis/api";
 
 import { AuthContext } from "../../contexts/authContext";
 
+import TextInput from "../../components/TextInput";
+
 function Login(props) {
   const authContext = useContext(AuthContext);
 
-  const [state, setState] = useState({ password: "", email: "" });
-  const [errors, setErrors] = useState({
-    email: null,
-    password: null,
-  });
+  const [state, setState] = useState({ passwordHash: "", email: "" });
+  const [errors, setErrors] = useState(null);
 
   function handleChange(event) {
     setState({
@@ -32,8 +31,8 @@ function Login(props) {
         "loggedInUser",
         JSON.stringify({ ...response.data })
       );
-      setErrors({ password: "", email: "" });
-      props.history.push("/book/all");
+      setError(null);
+      props.history.push("/login");
     } catch (err) {
       console.error(err.response);
       setErrors({ ...err.response.data.errors });
@@ -41,41 +40,41 @@ function Login(props) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Login</h1>
+    <div className="container mt-5">
+      <form onSubmit={handleSubmit}>
+        <h1>Acesse sua conta</h1>
 
-      <div>
-        <label htmlFor="signupFormEmail">E-mail Address</label>
-        <input
+        <TextInput
+          label="E-mail"
           type="email"
           name="email"
           id="signupFormEmail"
           value={state.email}
-          error={errors.email}
           onChange={handleChange}
         />
-      </div>
 
-      <div>
-        <label htmlFor="signupFormPassword">Password</label>
-        <input
+        <TextInput
+          label="Senha"
           type="password"
           name="password"
           id="signupFormPassword"
           value={state.password}
-          error={errors.password}
           onChange={handleChange}
         />
-      </div>
 
-      <div>
-        <button type="submit">Login!</button>
+        {error ? <div className="alert alert-danger">{error}</div> : null}
 
-        <Link to="/auth/signup">
-          Don't have an account? Click here to signup!
+        <div className="form-group">
+          <button className="btn btn-primary" type="submit">
+            Entrar
+          </button>
+        </div>
+
+        <Link className="pb-3" to="/auth/signup">
+          Ainda não é cadastrado? Clique aqui para se cadastrar!
         </Link>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }
 

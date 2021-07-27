@@ -3,26 +3,42 @@ import { Link } from "react-router-dom";
 import api from "../../apis/api";
 
 function Signup(props) {
-  const [state, setState] = useState({ name: "", password: "", email: "" });
-  const [errors, setErrors] = useState({
-    name: null,
-    email: null,
-    password: null,
+  const [state, setState] = useState({
+    name: "",
+    password: "",
+    email: "",
+    profilePictureUrl: "",
+    country: "",
+    city: "",
   });
+  const [errors, setErrors] = useState(null);
 
   function handleChange(event) {
+    if(event.target.files){
     setState({
       ...state,
       [event.currentTarget.name]: event.currentTarget.value,
     });
   }
 
+  async function handleFileUpload(file) {
+    const uploadData = new FormData();
+
+    uploadData.append("profilePictureUrl", file);
+
+    const response = await api.post("/upload", uploadData);
+  
+    return response.data.url;
+  }
+
+
   async function handleSubmit(event) {
     event.preventDefault();
 
     try {
       const response = await api.post("/signup", state);
-      setErrors({ name: "", password: "", email: "" });
+      const profilePicture = await handleFileUpload(state.profilePictureUrl)
+      setErrors(null);
       props.history.push("/auth/login");
     } catch (err) {
       console.error(err.response);
